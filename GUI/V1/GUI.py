@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5 import QtGui
-import sys, os
+import sys, os, time
 import cv2
 
 
@@ -107,7 +107,17 @@ class mainWindow(QMainWindow):
         button2.clicked.connect(self.gotoLiveDetect)# adding action to a button
 
         
-
+        Heading = QLabel("Computer Aided Endoscopy",self)
+        Heading.setGeometry(370, 70, 750, 100)
+        Heading.setStyleSheet("""
+                            QLabel{
+                                color: white;
+                                font-size: 60px;
+                                font-family: 'Gost';
+                                font-style: bold;
+                                
+                            }
+                              """)
 
 
         # closeBtn = QPushButton(self)
@@ -124,7 +134,7 @@ class mainWindow(QMainWindow):
         
     # def paintEvent(self, a0: QtGui.QPaintEvent) -> None:
     #     painter = QPainter(self)
-    #     pixmap = QPixmap("images/polyp.png")
+    #     pixmap = QPixmap("assets/polyp.png")
     #     painter.drawPixmap(self.rect(), pixmap)
 
 
@@ -323,7 +333,7 @@ class Window1(QDialog):
         homeBtn.clicked.connect(self.goMainWindow)# adding action to a button
         
         
-        
+
         self.outputImageLabel = QLabel(self)
         self.outputImageLabel.setGeometry(700, 105, 640, 480)
         
@@ -361,8 +371,17 @@ class Window1(QDialog):
         
         
         
-        
-        
+        headingLabel = QLabel("Diagnosis result", self)
+        headingLabel.setGeometry(680, 30, 400, 50)
+        headingLabel.setStyleSheet("""
+                                QLabel{
+                                    font-size: 40px;
+                                    font-family: 'Gost';
+                                    font-style: bold;
+                                    color: white;
+                                }
+                                """)
+
         # pixmap = QPixmap(self.res_location)
         # self.imgLabel.setPixmap(pixmap)
 
@@ -383,14 +402,18 @@ class Window1(QDialog):
         # option = self.options.index(self.combo.currentText())
         weightType = self.combo.currentText()
         source = self.getFilename()
+
+        #If nothing selected, return empty
+        if source == '':
+            return 0
         
         isBiopsy = self.suggestBiopsy.isChecked()
         
-        print(isBiopsy)
-        print(source)
-        print(weightType)
+        # print(isBiopsy)
+        # print(source)
+        # print(weightType)
         
-        
+
         if isBiopsy == True:                    #Biopsy checked
             if weightType == 'Heavy (High_Accuracy, Low_Speed)':               #heavy
                 biopsy_heavy.Detect(source)         
@@ -401,25 +424,68 @@ class Window1(QDialog):
                 normal_heavy.Detect(source)
             else:                                   #light
                 normal_light.Detect(source)
-        
+
+
         outDirectory = 'inference/output/'
         output_Link = outDirectory + source.split("/")[-1]
-        #print(outImage)
         
-        pixmap = QPixmap(output_Link)
-        self.outputImageLabel.setPixmap(pixmap)
+        #if image
+        if output_Link[-3:] == 'jpg' or output_Link[-3:] == 'png':
+            pixmap = QPixmap(output_Link)
+            self.outputImageLabel.setPixmap(pixmap)
+        #else if video
+        else:
+            self.playVideo(output_Link)
         
+
         #self.label.resize(800,600)
 
+    def playVideo(self, videoSource):
+        """
+        :param image: video source
+        """
+        cap = cv2.VideoCapture(videoSource)
+
+        if (cap.isOpened()== False):
+            print("Error opening video stream or file")
+
+        while(cap.isOpened()):
+            # Capture frame-by-frame
+            ret, frame = cap.read()
+            if ret == True:
+
+                # Display the resulting frame
+                #cv2.imshow('Frame',frame)
+
+                image = cv2.resize(frame, (640, 480), interpolation=cv2.INTER_AREA)
+
+                qformat = QImage.Format_Indexed8
+                if len(image.shape) == 3:
+                    if image.shape[2] == 4:
+                        qformat = QImage.Format_RGBA8888
+                    else:
+                        qformat = QImage.Format_RGB888
+                outImage = QImage(image, image.shape[1], image.shape[0], image.strides[0], qformat)
+                outImage = outImage.rgbSwapped()
+                #outImage = image
+                self.outputImageLabel.setPixmap(QPixmap.fromImage(outImage))
+                if cv2.waitKey(25) & 0xFF == ord('q'):
+                    break
+
+            else:
+                break
+        cap.release()
 
     def getFilename(self):
+        
         response = QFileDialog.getOpenFileName(
             parent=self,
             caption='Select image or video',
             directory=os.getcwd(),
-            filter='Images (*.png, *.jpg)'
+            #filter='Images (*.png, *.jpg, *.mp4)'
         )
         return response[0]
+        
 
 
 
@@ -665,10 +731,24 @@ class Window2(QDialog):
         self.setLayout(layout)
         
         
+
+        headingLabel = QLabel("Live Diagnosis", self)
+        headingLabel.setGeometry(680, 30, 400, 50)
+        headingLabel.setStyleSheet("""
+                                QLabel{
+                                    font-size: 40px;
+                                    font-family: 'Gost';
+                                    font-style: bold;
+                                    color: white;
+                                }
+                                """)
+
+
         self.setStyleSheet(u"background:rgb(91,90,90);")
         
         self.showMaximized()
         #self.resize(940,680)
+
 
     def update_frame(self):
         ret, self.image = self.capture.read()
