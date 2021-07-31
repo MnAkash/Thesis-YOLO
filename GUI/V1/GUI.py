@@ -39,7 +39,7 @@ class mainWindow(QMainWindow):
         #=====UI components
         
         # creating a push button
-        button1 = QPushButton("Diagnose Image/Video", self)
+        button1 = QPushButton("Diagnose from Image/Video", self)
         button1.setMinimumSize(QSize(350, 70))
         button1.setMaximumSize(QSize(350, 70))
         font6 = QFont()
@@ -74,7 +74,7 @@ class mainWindow(QMainWindow):
 
 
         # creating a push button
-        button2 = QPushButton("Diagnose live", self)
+        button2 = QPushButton("Diagnose Live", self)
         button2.setMinimumSize(QSize(350, 70))
         button2.setMaximumSize(QSize(350, 70))
         font6 = QFont()
@@ -158,7 +158,7 @@ class mainWindow(QMainWindow):
 class Window1(QDialog):
     def __init__(self, value= None, parent=None):
         super().__init__(parent)
-        self.setWindowTitle('Detect with Image/Video')
+        self.setWindowTitle('Diagnose from Image/Video')
         self.setWindowIcon(self.style().standardIcon(QStyle.SP_TitleBarNormalButton))
 
         self.originalPalette = QApplication.palette()
@@ -498,7 +498,7 @@ class Window1(QDialog):
 class Window2(QDialog):
     def __init__(self, value=None, parent=None):
         super().__init__(parent)
-        self.setWindowTitle('Live Detection')
+        self.setWindowTitle('Diagnose Live')
         self.setWindowIcon(self.style().standardIcon(QStyle.SP_TitleBarNormalButton))
         
         
@@ -792,7 +792,7 @@ class Window2(QDialog):
         
         
         weightType = self.combo.currentText()
-        source = '1'
+        source = '0'
         isBiopsy = self.suggestBiopsy.isChecked()
         
         # print(isBiopsy)
