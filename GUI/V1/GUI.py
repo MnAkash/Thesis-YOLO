@@ -11,7 +11,6 @@ from PyQt5.QtCore import *
 from PyQt5 import QtGui
 import sys, os
 import cv2
-import keyboard
 
 
 from detect import YOLO
@@ -149,7 +148,7 @@ class mainWindow(QMainWindow):
 class Window1(QDialog):
     def __init__(self, value= None, parent=None):
         super().__init__(parent)
-        self.setWindowTitle('Detect from ')
+        self.setWindowTitle('Detect with Image/Video')
         self.setWindowIcon(self.style().standardIcon(QStyle.SP_TitleBarNormalButton))
 
         self.originalPalette = QApplication.palette()
@@ -348,17 +347,15 @@ class Window1(QDialog):
             else:                                   #light
                 normal_light.Detect(source)
         
-        outDirectory = 'G:\\University materials\\Thesis-YOLO\\GUI\\V1\\inference\\output\\'
-        outImage = outDirectory + source.split("/")[-1]
-        print(outImage)
+        outDirectory = 'inference/output/'
+        output_Link = outDirectory + source.split("/")[-1]
+        #print(outImage)
         
-        pixmap = QPixmap(outImage)
+        pixmap = QPixmap(output_Link)
         self.outputImageLabel.setPixmap(pixmap)
         
         #self.label.resize(800,600)
-        
-        
-        print("Done!")
+
 
     def getFilename(self):
         response = QFileDialog.getOpenFileName(
@@ -370,10 +367,7 @@ class Window1(QDialog):
         return response[0]
 
 
-    # def paintEvent(self, a0: QtGui.QPaintEvent) -> None:
-    #     painter = QPainter(self)
-    #     pixmap = QPixmap("images/select_page.png")
-    #     painter.drawPixmap(self.rect(), pixmap)
+
     def goMainWindow(self):
         self.cams = mainWindow()
         self.cams.show()
@@ -383,42 +377,10 @@ class Window1(QDialog):
 class Window2(QDialog):
     def __init__(self, value=None, parent=None):
         super().__init__(parent)
-        self.setWindowTitle('Window2')
+        self.setWindowTitle('Live Detection')
         self.setWindowIcon(self.style().standardIcon(QStyle.SP_TitleBarNormalButton))
         
-        '''
-        self.res_location = 'images/stop.png'
-        startBtn = QPushButton("Start", self)
-        startBtn.setGeometry(50, 260, 200, 50)# setting geometry of button
-        startBtn.setIcon(QIcon('images/start.png'))
-        startBtn.setIconSize(QSize(40, 40))
-        startBtn.setFont(QFont('Times', 15))
-        startBtn.clicked.connect(self.startLive)# adding action to a button
-
-        stopBtn = QPushButton("Stop", self)
-        stopBtn.setGeometry(50, 330, 200, 50)
-        stopBtn.setIcon(QIcon('images/stop.png'))
-        stopBtn.setIconSize(QSize(40, 40))
-        stopBtn.setFont(QFont('Times', 15))
-        stopBtn.clicked.connect(self.stopLive)
-
-        homeBtn = QPushButton("Home", self)
-        homeBtn.setGeometry(50, 400, 200, 50)
-        homeBtn.setFont(QFont('Times', 15))
-        homeBtn.clicked.connect(self.goMainWindow)
         
-        
-        vert_divide = QFrame(self)
-        vert_divide.setObjectName(u"vert_divide")
-        vert_divide.setFrameShape(QFrame.VLine)
-        vert_divide.setFrameShadow(QFrame.Sunken)
-        
-
-        
-
-        self.imgLabel = QLabel(self)
-        self.imgLabel.setGeometry(550, 105, 640, 480)
-        '''
         self.options = ('Light', 'Heavy')
         self.combo = QComboBox()
         self.combo.setFixedSize(250,40)
@@ -452,7 +414,6 @@ class Window2(QDialog):
         #self.suggestBiopsy.toggled.connect(self.is_biopsy)
 
        
-
 
         startBtn = QPushButton("Start", self)
         startBtn.setObjectName(u"startBtn")
@@ -630,13 +591,8 @@ class Window2(QDialog):
         if window == 1:
             self.imgLabel.setPixmap(QPixmap.fromImage(outImage))
             #self.imgLabel.setScaledContents(True)
-            #print("Done")
         
         
-    # def paintEvent(self, a0: QtGui.QPaintEvent) -> None:
-    #     painter = QPainter(self)
-    #     pixmap = QPixmap("images/select_page.png")
-    #     painter.drawPixmap(self.rect(), pixmap)
     
     def startLive(self):
         # self.capture = cv2.VideoCapture(0)
@@ -667,12 +623,13 @@ class Window2(QDialog):
         
         
 
-    def stopLive(self):
+    def stopLive(self): #currently not working
         #print("Stop!")
         #self.timer.stop()
         #self.capture.release()
         #cv2.destroyAllWindows()
-        keyboard.press_and_release('q')
+        #keyboard.press_and_release('q')
+        pass
 
     def goMainWindow(self):
         try:
