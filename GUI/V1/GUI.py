@@ -154,7 +154,7 @@ class Window1(QDialog):
         self.originalPalette = QApplication.palette()
         
         
-        self.options = ('Light', 'Heavy')
+        self.options = ('Light (Low_Accuracy, High_Speed)', 'Heavy (High_Accuracy, Low_Speed')
         self.combo = QComboBox()
         self.combo.setFixedSize(250,40)
         #self.combo.setFont(QFont('calibri', 12))
@@ -381,7 +381,7 @@ class Window2(QDialog):
         self.setWindowIcon(self.style().standardIcon(QStyle.SP_TitleBarNormalButton))
         
         
-        self.options = ('Light', 'Heavy')
+        self.options = ('Light (Low_Accuracy, High_Speed)', 'Heavy (High_Accuracy, Low_Speed')
         self.combo = QComboBox()
         self.combo.setFixedSize(250,40)
         #self.combo.setFont(QFont('calibri', 12))
