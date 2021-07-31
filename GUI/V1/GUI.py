@@ -154,7 +154,7 @@ class Window1(QDialog):
         self.originalPalette = QApplication.palette()
         
         
-        self.options = ('Light (Low_Accuracy, High_Speed)', 'Heavy (High_Accuracy, Low_Speed')
+        self.options = ('Light (Low_Accuracy, High_Speed)', 'Heavy (High_Accuracy, Low_Speed)')
         self.combo = QComboBox()
         self.combo.setFixedSize(260,50)
         self.combo.setFont(QFont('arial', 11.5))
@@ -392,12 +392,12 @@ class Window1(QDialog):
         
         
         if isBiopsy == True:                    #Biopsy checked
-            if weightType == 'heavy':               #heavy
+            if weightType == 'Heavy (High_Accuracy, Low_Speed)':               #heavy
                 biopsy_heavy.Detect(source)         
             else:                                   #light
                 biopsy_light.Detect(source)
         else:                                   #Biopsy not checked
-            if weightType == 'heavy':               #heavy
+            if weightType == 'Heavy (High_Accuracy, Low_Speed)':               #heavy
                 normal_heavy.Detect(source)
             else:                                   #light
                 normal_light.Detect(source)
@@ -436,7 +436,7 @@ class Window2(QDialog):
         self.setWindowIcon(self.style().standardIcon(QStyle.SP_TitleBarNormalButton))
         
         
-        self.options = ('Light (Low_Accuracy, High_Speed)', 'Heavy (High_Accuracy, Low_Speed')
+        self.options = ('Light (Low_Accuracy, High_Speed)', 'Heavy (High_Accuracy, Low_Speed)')
         self.combo = QComboBox()
         self.combo.setFixedSize(260,50)
         self.combo.setFont(QFont('arial', 11.5))
@@ -721,12 +721,12 @@ class Window2(QDialog):
         
         
         if isBiopsy == True:                    #Biopsy checked
-            if weightType == 'heavy':               #heavy
+            if weightType == 'Heavy (High_Accuracy, Low_Speed)':               #heavy
                 biopsy_heavy.Detect(source)         
             else:                                   #light
                 biopsy_light.Detect(source)
         else:                                   #Biopsy not checked
-            if weightType == 'heavy':               #heavy
+            if weightType == 'Heavy (High_Accuracy, Low_Speed)':               #heavy
                 normal_heavy.Detect(source)
             else:                                   #light
                 normal_light.Detect(source)

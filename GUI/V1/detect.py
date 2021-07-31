@@ -22,7 +22,7 @@ class YOLO():
     
     def __init__(self, weights):
         parser = argparse.ArgumentParser()
-        parser.add_argument('--weights', nargs='+', type=str, default='weights/normal_light.pt', help='model.pt path(s)')
+        parser.add_argument('--weights', nargs='+', type=str, default= weights, help='model.pt path(s)')
         parser.add_argument('--source', type=str, default='0', help='source')  # file/folder, 0 for webcam
         parser.add_argument('--output', type=str, default='inference/output', help='output folder')  # output folder
         parser.add_argument('--img-size', type=int, default=416, help='inference size (pixels)')
@@ -37,13 +37,10 @@ class YOLO():
         parser.add_argument('--update', action='store_true', help='update all models')
         self.opt = parser.parse_args()
         #print(opt)
-        
-        
-        self.opt.weights = weights
 
 
     def Detect(self, source):
-        
+        print("Weight was: ",self.opt.weights)
         with torch.no_grad():
             if self.opt.update:  # update all models (to fix SourceChangeWarning)
                 for self.opt.weights in ['yolov5s.pt', 'yolov5m.pt', 'yolov5l.pt', 'yolov5x.pt']:
@@ -159,7 +156,9 @@ class YOLO():
                     cv2.imshow('', im0)
                     if cv2.waitKey(1) == ord('q'):  # q to quit
                         cv2.destroyAllWindows()
-                        raise StopIteration
+                        dataset.closeCam()
+                        #raise StopIteration
+                        return im0
     
                 # Save results (image with detections)
                 if save_img:
@@ -188,4 +187,3 @@ class YOLO():
         
 # yl = YOLO(weights='weights/normal_light.pt')
 # yl.Detect('G:\\University materials\\Thesis-YOLO\\GUI\\V1\\inference\\images\\1.jpg')
-
