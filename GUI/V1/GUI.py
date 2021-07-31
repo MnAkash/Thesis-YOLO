@@ -74,7 +74,7 @@ class mainWindow(QMainWindow):
 
 
         # creating a push button
-        button2 = QPushButton("Live Diagnose", self)
+        button2 = QPushButton("Diagnose live", self)
         button2.setMinimumSize(QSize(350, 70))
         button2.setMaximumSize(QSize(350, 70))
         font6 = QFont()
@@ -712,7 +712,7 @@ class Window2(QDialog):
         
         
         weightType = self.combo.currentText()
-        source = '0'
+        source = '1'
         isBiopsy = self.suggestBiopsy.isChecked()
         
         # print(isBiopsy)
