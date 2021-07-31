@@ -39,7 +39,7 @@ class mainWindow(QMainWindow):
         #=====UI components
         
         # creating a push button
-        button1 = QPushButton("Detect with image/video", self)
+        button1 = QPushButton("Diagnose Image/Video", self)
         button1.setMinimumSize(QSize(350, 70))
         button1.setMaximumSize(QSize(350, 70))
         font6 = QFont()
@@ -48,7 +48,7 @@ class mainWindow(QMainWindow):
         button1.setFont(font6)
         button1.setStyleSheet(u"QPushButton {\n"
 "	border: 2px solid rgb(51,51,51);\n"
-"	border-radius: 5px;	\n"
+"	border-radius: 10px;	\n"
 "	color:rgb(255,255,255);\n"
 "	background-color: rgb(51,51,51);\n"
 "}\n"
@@ -74,7 +74,7 @@ class mainWindow(QMainWindow):
 
 
         # creating a push button
-        button2 = QPushButton("Detect Live", self)
+        button2 = QPushButton("Live Diagnose", self)
         button2.setMinimumSize(QSize(350, 70))
         button2.setMaximumSize(QSize(350, 70))
         font6 = QFont()
@@ -83,7 +83,7 @@ class mainWindow(QMainWindow):
         button2.setFont(font6)
         button2.setStyleSheet(u"QPushButton {\n"
 "	border: 2px solid rgb(51,51,51);\n"
-"	border-radius: 5px;	\n"
+"	border-radius: 10px;	\n"
 "	color:rgb(255,255,255);\n"
 "	background-color: rgb(51,51,51);\n"
 "}\n"
