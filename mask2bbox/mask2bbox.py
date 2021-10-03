@@ -20,6 +20,8 @@ def mask2bbox(main_image, mask_image, show_bbox=False, show_contour=False):
     # Load the main image
     image = cv2.imread(main_image)
     
+    im_height, im_width, _ = image.shape
+    
     # Load the mask image
     #since mask image is pure 2D B&W image, skimage is used to load it
     im = io.imread(mask_image)
@@ -43,14 +45,16 @@ def mask2bbox(main_image, mask_image, show_bbox=False, show_contour=False):
     # h > height of the bounding box
      
     # Draw bounding boxs around all contours
-    for c in contours:
-      x, y, w, h = cv2.boundingRect(c)
-      box.append([x,y,w,h])
-      
+    for c in contours:      
       # Make sure contour area is large enough
-      if (cv2.contourArea(c)) > 8:
+      if (cv2.contourArea(c)) > 10:
+        x, y, w, h = cv2.boundingRect(c)
         cv2.rectangle(image,(x,y), (x+w,y+h), (0,0,255), 2)
         
+        #===============normalize values for YOLO algorithm
+        box.append([x/im_width ,y/im_height, w/im_width, h/im_height])
+    
+    if show_bbox:cv2.imshow('All contours with bounding box', image)
     return box
 
 def xywh2yoloBox(x,y,w,h):
