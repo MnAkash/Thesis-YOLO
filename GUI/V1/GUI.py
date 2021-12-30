@@ -134,7 +134,7 @@ class mainWindow(QMainWindow):
         
     # def paintEvent(self, a0: QtGui.QPaintEvent) -> None:
     #     painter = QPainter(self)
-    #     pixmap = QPixmap("assets/polyp.png")
+    #     pixmap = QPixmap("assets/bg.jpg")
     #     painter.drawPixmap(self.rect(), pixmap)
 
 
@@ -396,7 +396,11 @@ class Window1(QDialog):
         #self.showFullScreen()
         self.showMaximized()
         #self.resize(940,680)
-        
+    
+    # def paintEvent(self, a0: QtGui.QPaintEvent) -> None:
+    #     painter = QPainter(self)
+    #     pixmap = QPixmap("assets/bg.jpg")
+    #     painter.drawPixmap(self.rect(), pixmap)
         
     def treatSelectedFile(self):
         # option = self.options.index(self.combo.currentText())
@@ -749,6 +753,10 @@ class Window2(QDialog):
         self.showMaximized()
         #self.resize(940,680)
 
+    # def paintEvent(self, a0: QtGui.QPaintEvent) -> None:
+    #     painter = QPainter(self)
+    #     pixmap = QPixmap("assets/bg.jpg")
+    #     painter.drawPixmap(self.rect(), pixmap)
 
     def update_frame(self):
         ret, self.image = self.capture.read()
