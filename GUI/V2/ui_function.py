@@ -232,8 +232,8 @@ class UIFunction(MainWindow):
     def stackPage(self):
 
         ######### PAGE_HOME ############# BELOW DISPLAYS THE FUNCTION OF WIDGET, LABEL, PROGRESS BAR, E.T.C IN STACKEDWIDGET page_HOME
-        self.ui.lab_home_main_hed.setText("Profile")
-        self.ui.lab_home_stat_hed.setText("Stat")
+        self.ui.lab_home_main_hed.setText("Live Detection")
+        self.ui.lab_home_stat_hed.setText("Selection")
 
         ######### PAGE_BUG ############## BELOW DISPLAYS THE FUNCTION OF WIDGET, LABEL, PROGRESS BAR, E.T.C IN STACKEDWIDGET page_bug
         self.ui.bn_bug_start.clicked.connect(lambda: APFunction.addNumbers(self, self.ui.comboBox_bug.currentText(), True))  

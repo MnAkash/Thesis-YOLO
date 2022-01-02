@@ -305,7 +305,7 @@ class Ui_MainWindow(object):
 "	background-color: rgba(0,0,0,0);\n"
 "}")
         icon4 = QIcon()
-        icon4.addFile(u"icons/1x/homeAsset 46.png", QSize(), QIcon.Normal, QIcon.Off)
+        icon4.addFile(u"icons/1x/live.png", QSize(), QIcon.Normal, QIcon.Off)
         self.bn_home.setIcon(icon4)
         self.bn_home.setIconSize(QSize(22, 22))
         self.bn_home.setFlat(True)
