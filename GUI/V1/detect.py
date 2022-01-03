@@ -186,4 +186,4 @@ class YOLO():
         
         
 # yl = YOLO(weights='weights/normal_light.pt')
-# yl.Detect('G:\\University materials\\Thesis-YOLO\\GUI\\V1\\inference\\images\\1.jpg')
+# yl.Detect('inference\\images\\1.jpg')
