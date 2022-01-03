@@ -1,9 +1,9 @@
 ###########################################################################################
-###                        CODE:       WRITTEN BY: ANJAL.P AUGUST 11 2020               ###
-###                        PROJECT:    PELLIS Z1                                        ###
-###                        PURPOSE:    WINDOWS/LINUX/MAC OS FLAT MODERN UI              ###
+###                        CODE:       WRITTEN BY: M.M.Akash December 27 2021           ###
+###                        PROJECT:    Yolo Based Polyp Detection                       ###
+###                        PURPOSE:    Undergrad Thesis                                 ###
 ###                                    BASED ON QT DESIGNER, PySide2                    ###
-###                        USE CASE:   TEMPLATE FOR SOFTWARES                           ###
+###                        USE CASE:   Used by doctors for polyp detection              ###
 ###                        LICENCE:    MIT OPENSOURCE LICENCE                           ###
 ###                                                                                     ###
 ###                            CODE IS FREE TO USE AND MODIFY                           ###
@@ -36,12 +36,22 @@ from main import * #IMPORTING THE MAIN.PY FILE
 from about import *
 
 
+print("Loading weights...")
+Polyp_heavy = YOLO('weights/Polyp_heavy.pt')
+Polyp_light = YOLO('weights/Polyp_light.pt')
+Cancer_heavy = YOLO('weights/Cancer_heavy.pt')
+Cancer_light = YOLO('weights/Cancer_light.pt')
+Upper_heavy = YOLO('weights/Upper_heavy.pt')
+Upper_light = YOLO('weights/Upper_light.pt')
+print("\nWeight loaded!\n")
+
+
 GLOBAL_STATE = 0 #NECESSERY FOR CHECKING WEATHER THE WINDWO IS FULL SCREEN OR NOT
 GLOBAL_TITLE_BAR = True #NECESSERY FOR CHECKING WEATHER THE WINDWO IS FULL SCREEN OR NOT
 init = False # NECRESSERY FOR INITITTION OF THE WINDOW.
 
-# tab_Buttons = ['bn_home', 'bn_bug', 'bn_android', 'bn_cloud'] #BUTTONS IN MAIN TAB  
-# android_buttons = ['bn_android_contact', 'bn_android_game', 'bn_android_clean', 'bn_android_world'] #BUTTONS IN ANDROID STACKPAGE
+# tab_Buttons = ['bn_home', 'bn_bug', 'bn_setting', 'bn_cloud'] #BUTTONS IN MAIN TAB  
+# setting_buttons = ['bn_setting_contact', 'bn_setting_game', 'bn_setting_clean', 'bn_setting_world'] #BUTTONS IN setting STACKPAGE
 
 # THIS CLASS HOUSES ALL FUNCTION NECESSERY FOR OUR PROGRAMME TO RUN.
 class UIFunction(MainWindow):
@@ -199,17 +209,17 @@ class UIFunction(MainWindow):
                 self.ui.lab_tab.setText("About > Bug")
                 self.ui.frame_bug.setStyleSheet("background:rgb(91,90,90)") # SETS THE BACKGROUND OF THE CLICKED BUTTON TO LITER COLOR THAN THE REST
 
-        elif buttonName=='bn_android':
+        elif buttonName=='bn_setting':
             if self.ui.frame_bottom_west.width()==80  and index!=7:
-                self.ui.stackedWidget.setCurrentWidget(self.ui.page_android)
-                self.ui.lab_tab.setText("Android")
-                self.ui.frame_android.setStyleSheet("background:rgb(91,90,90)") # SETS THE BACKGROUND OF THE CLICKED BUTTON TO LITER COLOR THAN THE REST
+                self.ui.stackedWidget.setCurrentWidget(self.ui.page_setting)
+                self.ui.lab_tab.setText("Setting")
+                self.ui.frame_setting.setStyleSheet("background:rgb(91,90,90)") # SETS THE BACKGROUND OF THE CLICKED BUTTON TO LITER COLOR THAN THE REST
                 UIFunction.androidStackPages(self, "page_contact")
 
             elif self.ui.frame_bottom_west.width()==160  and index!=3:   # ABOUT PAGE STACKED WIDGET
-                self.ui.stackedWidget.setCurrentWidget(self.ui.page_about_android)
-                self.ui.lab_tab.setText("About > Android")
-                self.ui.frame_android.setStyleSheet("background:rgb(91,90,90)") # SETS THE BACKGROUND OF THE CLICKED BUTTON TO LITER COLOR THAN THE REST
+                self.ui.stackedWidget.setCurrentWidget(self.ui.page_about_setting)
+                self.ui.lab_tab.setText("About > setting")
+                self.ui.frame_setting.setStyleSheet("background:rgb(91,90,90)") # SETS THE BACKGROUND OF THE CLICKED BUTTON TO LITER COLOR THAN THE REST
 
         elif buttonName=='bn_cloud':
             if self.ui.frame_bottom_west.width()==80 and index!=6:
@@ -226,14 +236,140 @@ class UIFunction(MainWindow):
     ########################################################################################################################
 
 
+
+
+
+    #----> BUTTON IN HOME TAB PRESSED EXECUTES THE CORRESPONDING PAGE IN STACKEDWIDGET PAGES
+    def homeButtonPressed(self, buttonName):
+        if buttonName=='pushButton_select':
+            # print("pushButton_select")
+            weightType = self.ui.comboBox.currentText()
+            source = response = QFileDialog.getOpenFileName(
+                            parent=self,
+                            caption='Select image or video',
+                            directory=os.getcwd(),
+                            #filter='Images (*.png, *.jpg, *.mp4)'
+                        )[0]
+            
+            #If nothing selected, return empty
+            if source == '':
+                return 0
+            
+            isBiopsy = self.ui.checkBox_suggestBiopsy.isChecked()
+            isColonoscopy = self.ui.radioButton_colonoscopy.isChecked()
+
+            print(isBiopsy)
+            print(source)
+            print(weightType)
+            print(isColonoscopy)
+
+            if isColonoscopy == True:                   #Doing Colonoscopy
+
+                if isBiopsy == True:                    #Biopsy checked
+                    if weightType == 'Heavy':               #heavy
+                        Cancer_heavy.Detect(source)         
+                    else:                                   #light
+                        Cancer_light.Detect(source)
+                else:                                   #Biopsy not checked
+                    if weightType == 'Heavy':               #heavy
+                        Polyp_heavy.Detect(source)
+                    else:                                   #light
+                        Polyp_light.Detect(source)
+
+            else:                                       #Doing Endoscopy
+                if weightType == 'Heavy':               #heavy
+                    Upper_heavy.Detect(source)
+                else:                                   #light
+                    Upper_light.Detect(source)
+
+            outDirectory = 'inference/output/'
+            output_Link = outDirectory + source.split("/")[-1]
+            
+            #if image
+            if output_Link[-3:] == 'jpg' or output_Link[-3:] == 'png':
+                pixmap = QPixmap(output_Link)
+                self.ui.lab_home_main_disc.setPixmap(pixmap)
+                _translate = QCoreApplication.translate
+                self.ui.lab_home_main_hed.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-size:20pt; color:#ff5500;\">Detected from Image</span></p></body></html>"))
+                
+            #else if video
+            else:
+                _translate = QCoreApplication.translate
+                self.ui.lab_home_main_hed.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-size:20pt; color:#ff5500;\">Detection from Video</span></p></body></html>"))
+                cap = cv2.VideoCapture(output_Link)
+
+                if (cap.isOpened()== False):
+                    print("Error opening video stream or file")
+
+                while(cap.isOpened()):
+                    # Capture frame-by-frame
+                    ret, frame = cap.read()
+                    if ret == True:
+
+                        # Display the resulting frame
+                        #cv2.imshow('Frame',frame)
+
+                        image = cv2.resize(frame, (640, 480), interpolation=cv2.INTER_AREA)
+
+                        qformat = QImage.Format_Indexed8
+                        if len(image.shape) == 3:
+                            if image.shape[2] == 4:
+                                qformat = QImage.Format_RGBA8888
+                            else:
+                                qformat = QImage.Format_RGB888
+                        outImage = QImage(image, image.shape[1], image.shape[0], image.strides[0], qformat)
+                        outImage = outImage.rgbSwapped()
+                        #outImage = image
+                        self.ui.lab_home_main_disc.setPixmap(QPixmap.fromImage(outImage))
+                        if cv2.waitKey(25) & 0xFF == ord('q'):
+                            break
+
+                    else:
+                        break
+                cap.release()
+                #end video play
+
+        elif buttonName=='pushButton_start':
+            self.ui.lab_home_main_disc.clear()
+            _translate = QCoreApplication.translate
+            self.ui.lab_home_main_hed.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-size:20pt; color:#ff5500;\">Live Detection</span></p></body></html>"))
+            weightType = self.ui.comboBox.currentText()
+            isBiopsy = self.ui.checkBox_suggestBiopsy.isChecked()
+            isColonoscopy = self.ui.radioButton_colonoscopy.isChecked()
+            source = '0'
+
+
+            if isColonoscopy == True:                   #Doing Colonoscopy
+
+                if isBiopsy == True:                    #Biopsy checked
+                    if weightType == 'Heavy':               #heavy
+                        Cancer_heavy.Detect(source)         
+                    else:                                   #light
+                        Cancer_light.Detect(source)
+                else:                                   #Biopsy not checked
+                    if weightType == 'Heavy':               #heavy
+                        Polyp_heavy.Detect(source)
+                    else:                                   #light
+                        Polyp_light.Detect(source)
+
+            else:                                       #Doing Endoscopy
+                if weightType == 'Heavy':               #heavy
+                    Upper_heavy.Detect(source)
+                else:                                   #light
+                    Upper_light.Detect(source)
+
+        elif buttonName=='pushButton_stop':
+            print("pushButton_stop")
+
+
     #----> STACKWIDGET EACH PAGE FUNCTION PAGE FUNCTIONS
     # CODE TO PERFOMR THE TASK IN THE STACKED WIDGET PAGE 
     # WHAT EVER WIDGET IS IN THE STACKED PAGES ITS ACTION IS EVALUATED HERE AND THEN THE REST FUNCTION IS PASSED.
     def stackPage(self):
 
         ######### PAGE_HOME ############# BELOW DISPLAYS THE FUNCTION OF WIDGET, LABEL, PROGRESS BAR, E.T.C IN STACKEDWIDGET page_HOME
-        self.ui.lab_home_main_hed.setText("Live Detection")
-        self.ui.lab_home_stat_hed.setText("Selection")
+        #self.ui.lab_home_main_hed.setText("Live Detection")
+        #self.ui.lab_home_stat_hed.setText("Selection")
 
         ######### PAGE_BUG ############## BELOW DISPLAYS THE FUNCTION OF WIDGET, LABEL, PROGRESS BAR, E.T.C IN STACKEDWIDGET page_bug
         self.ui.bn_bug_start.clicked.connect(lambda: APFunction.addNumbers(self, self.ui.comboBox_bug.currentText(), True))  
@@ -247,23 +383,23 @@ class UIFunction(MainWindow):
         self.ui.bn_cloud_clear.clicked.connect(lambda: APFunction.cloudClear(self))
 
         #########PAGE ANDROID WIDGET AND ITS STACKANDROID WIDGET PAGES
-        self.ui.bn_android_contact.clicked.connect(lambda: UIFunction.androidStackPages(self, "page_contact"))
-        self.ui.bn_android_game.clicked.connect(lambda: UIFunction.androidStackPages(self, "page_game"))
-        self.ui.bn_android_clean.clicked.connect(lambda: UIFunction.androidStackPages(self, "page_clean"))
-        self.ui.bn_android_world.clicked.connect(lambda: UIFunction.androidStackPages(self, "page_world"))
+        self.ui.bn_setting_contact.clicked.connect(lambda: UIFunction.androidStackPages(self, "page_contact"))
+        self.ui.bn_setting_game.clicked.connect(lambda: UIFunction.androidStackPages(self, "page_game"))
+        self.ui.bn_setting_clean.clicked.connect(lambda: UIFunction.androidStackPages(self, "page_clean"))
+        self.ui.bn_setting_world.clicked.connect(lambda: UIFunction.androidStackPages(self, "page_world"))
         
-        ######ANDROID > PAGE CONTACT >>>>>>>>>>>>>>>>>>>>
-        self.ui.bn_android_contact_delete.clicked.connect(lambda: self.dialogexec("Warning", "The Contact Infromtion will be Deleted, Do you want to continue.", "icons/1x/errorAsset 55.png", "Cancel", "Yes"))
+        ######Setting > PAGE CONTACT >>>>>>>>>>>>>>>>>>>>
+        self.ui.bn_setting_contact_delete.clicked.connect(lambda: self.dialogexec("Warning", "The Contact Infromtion will be Deleted, Do you want to continue.", "icons/1x/errorAsset 55.png", "Cancel", "Yes"))
 
-        self.ui.bn_android_contact_edit.clicked.connect(lambda: APFunction.editable(self))
+        self.ui.bn_setting_contact_edit.clicked.connect(lambda: APFunction.editable(self))
 
-        self.ui.bn_android_contact_save.clicked.connect(lambda: APFunction.saveContact(self))
+        self.ui.bn_setting_contact_save.clicked.connect(lambda: APFunction.saveContact(self))
 
-        #######ANDROID > PAGE GAMEPAD >>>>>>>>>>>>>>>>>>>
+        #######Setting > PAGE GAMEPAD >>>>>>>>>>>>>>>>>>>
         self.ui.textEdit_gamepad.setVerticalScrollBar(self.ui.vsb_gamepad)   # SETTING THE TEXT FILED AREA A SCROLL BAR
         self.ui.textEdit_gamepad.setText("Type Here Something, or paste something here")
 
-        ######ANDROID > PAGE CLEAN >>>>>>>>>>>>>>>>>>>>>>
+        ######Setting > PAGE CLEAN >>>>>>>>>>>>>>>>>>>>>>
         #NOTHING HERE
         self.ui.horizontalSlider_2.valueChanged.connect(lambda: print("Slider: Horizondal: ", self.ui.horizontalSlider_2.value())) #CHECK WEATHER THE SLIDER IS MOVED OR NOT
         self.ui.checkBox.stateChanged.connect(lambda: self.errorexec("Happy to Know you liked the UI", "icons/1x/smile2Asset 1.png", "Ok")) #WHEN THE CHECK BOX IS CHECKED IT ECECUTES THE ERROR BOX WITH MESSAGE.
@@ -275,34 +411,34 @@ class UIFunction(MainWindow):
     ################################################################################################################################
 
 
-    #-----> FUNCTION TO SHOW CORRESPONDING STACK PAGE WHEN THE ANDROID BUTTONS ARE PRESSED: CONTACT, GAME, CLOUD, WORLD
-    # SINCE THE ANDROID PAGE AHS A SUB STACKED WIDGET WIT FOUR MORE BUTTONS, ALL THIS 4 PAGES CONTENT: BUTTONS, TEXT, LABEL E.T.C ARE INITIALIED OVER HERE. 
+    #-----> FUNCTION TO SHOW CORRESPONDING STACK PAGE WHEN THE Setting BUTTONS ARE PRESSED: CONTACT, GAME, CLOUD, WORLD
+    # SINCE THE Setting PAGE AHS A SUB STACKED WIDGET WIT FOUR MORE BUTTONS, ALL THIS 4 PAGES CONTENT: BUTTONS, TEXT, LABEL E.T.C ARE INITIALIED OVER HERE. 
     def androidStackPages(self, page):
         #------> THIS LINE CLEARS THE BG COLOR OF PREVIOUS TABS
-        for each in self.ui.frame_android_menu.findChildren(QFrame):
+        for each in self.ui.frame_setting_menu.findChildren(QFrame):
             each.setStyleSheet("background:rgb(51,51,51)")
 
         if page == "page_contact":
-            self.ui.stackedWidget_android.setCurrentWidget(self.ui.page_android_contact)
-            self.ui.lab_tab.setText("Android > Contact")
-            self.ui.frame_android_contact.setStyleSheet("background:rgb(91,90,90)")
+            self.ui.stackedWidget_setting.setCurrentWidget(self.ui.page_setting_contact)
+            self.ui.lab_tab.setText("setting > Contact")
+            self.ui.frame_setting_contact.setStyleSheet("background:rgb(91,90,90)")
 
         elif page == "page_game":
-            self.ui.stackedWidget_android.setCurrentWidget(self.ui.page_android_game)
-            self.ui.lab_tab.setText("Android > GamePad")
-            self.ui.frame_android_game.setStyleSheet("background:rgb(91,90,90)")
+            self.ui.stackedWidget_setting.setCurrentWidget(self.ui.page_setting_game)
+            self.ui.lab_tab.setText("setting > GamePad")
+            self.ui.frame_setting_game.setStyleSheet("background:rgb(91,90,90)")
 
         elif page == "page_clean":
-            self.ui.stackedWidget_android.setCurrentWidget(self.ui.page_android_clean)
-            self.ui.lab_tab.setText("Android > Clean")
-            self.ui.frame_android_clean.setStyleSheet("background:rgb(91,90,90)")
+            self.ui.stackedWidget_setting.setCurrentWidget(self.ui.page_setting_clean)
+            self.ui.lab_tab.setText("setting > Clean")
+            self.ui.frame_setting_clean.setStyleSheet("background:rgb(91,90,90)")
 
         elif page == "page_world":
-            self.ui.stackedWidget_android.setCurrentWidget(self.ui.page_android_world)
-            self.ui.lab_tab.setText("Android > World")
-            self.ui.frame_android_world.setStyleSheet("background:rgb(91,90,90)")
+            self.ui.stackedWidget_setting.setCurrentWidget(self.ui.page_setting_world)
+            self.ui.lab_tab.setText("setting > World")
+            self.ui.frame_setting_world.setStyleSheet("background:rgb(91,90,90)")
 
-        #ADD A ADDITIONAL ELIF STATEMNT WITH THE SIMILAR CODE UP ABOVE FOR YOUR NEW SUBMENU BUTTON IN THE ANDROID STACK PAGE.
+        #ADD A ADDITIONAL ELIF STATEMNT WITH THE SIMILAR CODE UP ABOVE FOR YOUR NEW SUBMENU BUTTON IN THE setting STACK PAGE.
     ##############################################################################################################
 
     
@@ -341,29 +477,29 @@ class APFunction():
         self.ui.line_cloud_adress.setText("")
         self.ui.line_cloud_id.setText("")
 
-    #-----> FUNCTION IN ACCOUNT OF CONTACT PAGE IN ANDROID MENU
+    #-----> FUNCTION IN ACCOUNT OF CONTACT PAGE IN setting MENU
     def editable(self):
-        self.ui.line_android_name.setEnabled(True)
-        self.ui.line_android_adress.setEnabled(True)
-        self.ui.line_android_org.setEnabled(True)
-        self.ui.line_android_email.setEnabled(True)
-        self.ui.line_android_ph.setEnabled(True)
+        self.ui.line_setting_name.setEnabled(True)
+        self.ui.line_setting_adress.setEnabled(True)
+        self.ui.line_setting_org.setEnabled(True)
+        self.ui.line_setting_email.setEnabled(True)
+        self.ui.line_setting_ph.setEnabled(True)
 
-        self.ui.bn_android_contact_save.setEnabled(True)
-        self.ui.bn_android_contact_edit.setEnabled(False)
-        self.ui.bn_android_contact_share.setEnabled(False)
-        self.ui.bn_android_contact_delete.setEnabled(False)
+        self.ui.bn_setting_contact_save.setEnabled(True)
+        self.ui.bn_setting_contact_edit.setEnabled(False)
+        self.ui.bn_setting_contact_share.setEnabled(False)
+        self.ui.bn_setting_contact_delete.setEnabled(False)
 
 #-----> FUNCTION TO SAVE THE MODOFOED TEXT FIELD
     def saveContact(self):
-        self.ui.line_android_name.setEnabled(False)
-        self.ui.line_android_adress.setEnabled(False)
-        self.ui.line_android_org.setEnabled(False)
-        self.ui.line_android_email.setEnabled(False)
-        self.ui.line_android_ph.setEnabled(False)
+        self.ui.line_setting_name.setEnabled(False)
+        self.ui.line_setting_adress.setEnabled(False)
+        self.ui.line_setting_org.setEnabled(False)
+        self.ui.line_setting_email.setEnabled(False)
+        self.ui.line_setting_ph.setEnabled(False)
 
-        self.ui.bn_android_contact_save.setEnabled(False)
-        self.ui.bn_android_contact_edit.setEnabled(True)
-        self.ui.bn_android_contact_share.setEnabled(True)
-        self.ui.bn_android_contact_delete.setEnabled(True)
+        self.ui.bn_setting_contact_save.setEnabled(False)
+        self.ui.bn_setting_contact_edit.setEnabled(True)
+        self.ui.bn_setting_contact_share.setEnabled(True)
+        self.ui.bn_setting_contact_delete.setEnabled(True)
 ###############################################################################################################################################################
